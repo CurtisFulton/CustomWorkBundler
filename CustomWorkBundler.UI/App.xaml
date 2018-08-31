@@ -1,0 +1,16 @@
+﻿<Application x:Class="CustomWorkBundler.UI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:CustomWorkBundler.UI"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <local:FileToStringConverter x:Key="fileToString"/>
+        <local:DirectoryToStringConverter x:Key="dirToString"/>
+        <local:PreviousBundleToStringConverter x:Key="prevBundleToString"/>
+
+        <local:EnumBooleanConverter x:Key="enumToBool"/>
+        <local:InvertBooleanConverter x:Key="invertBool" />
+
+        <BooleanToVisibilityConverter x:Key="boolToVis" />
+    </Application.Resources>
+</Application>

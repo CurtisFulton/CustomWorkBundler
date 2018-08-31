@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="CustomWorkBundler.UI.ResourceSelector"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CustomWorkBundler.UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="437.9" Margin="5">
+    <StackPanel Background="GhostWhite" Orientation="Vertical" Height="175">
+        <TextBlock Text="{Binding Title}" Margin="10 10 10 0" FontWeight="Bold" FontSize="17.5"/>
+
+        <StackPanel Height="75">
+            <!-- File Selection Details Radio Buttons -->
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.ColumnSpan="2" Margin="0 10 0 10">
+                <RadioButton Name="StandardBuild" 
+                         IsChecked="{Binding Path=FolderSourceType, Converter={StaticResource enumToBool}, ConverterParameter={x:Static local:SelectorType.Standard}}"
+                         Margin="10 0 0 0">Standard Build</RadioButton>
+
+                <RadioButton Name="PreviousBundle" 
+                         IsChecked="{Binding Path=FolderSourceType, Converter={StaticResource enumToBool}, ConverterParameter={x:Static local:SelectorType.PreviousBuild}}"
+                         Margin="10 0 0 0">Previous Bundle</RadioButton>
+
+                <RadioButton Name="CustomSelection" 
+                         IsChecked="{Binding Path=FolderSourceType, Converter={StaticResource enumToBool}, ConverterParameter={x:Static local:SelectorType.Custom}}" 
+                         Margin="10 0 0 0">Folder Select</RadioButton>
+            </StackPanel>
+
+            <!-- Folder selections -->
+            <local:CustomSelection Margin="10 0 0 0" Visibility="{Binding IsChecked, ElementName=CustomSelection, Converter={StaticResource boolToVis}}" />
+            <local:PreviousBundleSelection Margin="10 0 0 0" Visibility="{Binding IsChecked, ElementName=PreviousBundle, Converter={StaticResource boolToVis}}"/>
+            <local:StandardSelection Margin="10 0 0 0" Visibility="{Binding IsChecked, ElementName=StandardBuild, Converter={StaticResource boolToVis}}"/>
+        </StackPanel>
+        
+        
+        <!-- Database Connection Details Radio Buttons -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.ColumnSpan="2" Margin="0 10 0 10">
+            <RadioButton Name="StandardConnection" 
+                         IsChecked="{Binding Path=DatabaseSourceType, Converter={StaticResource enumToBool}, ConverterParameter={x:Static local:SelectorType.Standard}}"
+                         Margin="10 0 0 0">Standard Build</RadioButton>
+
+            <RadioButton Name="PreviousConnection" 
+                         IsChecked="{Binding Path=DatabaseSourceType, Converter={StaticResource enumToBool}, ConverterParameter={x:Static local:SelectorType.PreviousBuild}}"
+                         Margin="10 0 0 0">Previous Bundle</RadioButton>
+
+            
+            <RadioButton Name="CustomConnection" 
+                         IsChecked="{Binding Path=DatabaseSourceType, Converter={StaticResource enumToBool}, ConverterParameter={x:Static local:SelectorType.Custom}}" 
+                         Margin="10 0 0 0">Connection String</RadioButton>
+        </StackPanel>
+
+        <!-- Database Connections -->
+        <local:CustomConnection Margin="10 0 0 0" Visibility="{Binding IsChecked, ElementName=CustomConnection, Converter={StaticResource boolToVis}}" DataContext="{Binding CustomConnectionViewModel}" />
+        <local:PreviousBundleConnection Margin="10 0 0 0" Visibility="{Binding IsChecked, ElementName=PreviousConnection, Converter={StaticResource boolToVis}}"/>
+        <local:StandardConnection Margin="10 0 0 0" Visibility="{Binding IsChecked, ElementName=StandardConnection, Converter={StaticResource boolToVis}}"/>
+    </StackPanel>
+</UserControl>
