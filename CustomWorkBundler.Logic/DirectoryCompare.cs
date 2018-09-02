@@ -1,169 +1,122 @@
-﻿using System;
+using CustomWorkBundler.Logic.Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomWorkBundler
+namespace CustomWorkBundler.Logic
 {
     public class DirectoryCompare
     {
-        public FileInfo[] Differences { get; private set; }
-        public string DirectoryPathA { get; private set; }
-        public string DirectoryPathB { get; private set; }
+        private string PathA { get; set; }
+        private string PathB { get; set; }
 
-        private List<string> ExcludeExtensions { get; set; } = new List<string> { ".js", ".map", ".pdb", ".csproj", ".user"};
-        private List<string> ExcludeFiles { get; set; } = new List<string> { "debuglog", "log.txt", "listinglayout", "reportdata", "userdata", "Web.config",
-                                                                            "log4net", "Newtonsoft.json", "System.Net", "System.Web", "MEXData_Ideablade.dll",
-                                                                            "UpgradeSQL.sql", "Mexdata.dll.config", "IdeaBlade.ibconfig", "jquery.livequery.min.js" };
-
-        private List<string> ExcludePaths { get; set; } = new List<string> { "obj", "Documents", "Downloads"};
-        private bool IgnoreRootFiles { get; set; } = true;
-
-        public DirectoryCompare(string pathA, string pathB, bool generateDifferences = true)
-        {
-            DirectoryPathA = pathA;
-            DirectoryPathB = pathB;
-
-            if (generateDifferences)
-                Differences = CompareDirectories();
-        }
-
-        public FileInfo[] CompareDirectories()
-        {
-            // If source path is null, we want to just return all the files in Path B as there is nothing to compare to
-            if (DirectoryPathA == null)
-                return new DirectoryInfo(DirectoryPathB).GetFiles("*.*", SearchOption.AllDirectories).Where(IsValidFile).ToArray();
-
-            DirectoryInfo dirA = new DirectoryInfo(DirectoryPathA);
-            DirectoryInfo dirB = new DirectoryInfo(DirectoryPathB);
-            
-            FileInfo[] filesA = dirA.GetFiles("*.*", SearchOption.AllDirectories).Where(IsValidFile).ToArray();
-            FileInfo[] filesB = dirB.GetFiles("*.*", SearchOption.AllDirectories).Where(IsValidFile).ToArray();
-            
-            var fileComparer = new FileCompare(DirectoryPathA, DirectoryPathB);
-
-            var differences = new List<FileInfo>(filesB.Length);
-            for (int i = 0; i < filesB.Length; i++) {
-                // Check if the file in B's director does not exist/Is not the same in directory A
-                if (!filesA.Contains(filesB[i], fileComparer))
-                    differences.Add(filesB[i]);
-            }
-
-            Differences = differences.ToArray();
-
-            return Differences;
-        }
-
-        public async Task<FileInfo[]> CompareDirectoriesAsync()
-        {
-            DirectoryInfo dirA = new DirectoryInfo(DirectoryPathA);
-
-            FileInfo[] filesA = dirA.GetFiles("*.*", SearchOption.AllDirectories).Where(IsValidFile).ToArray();
-            
-            DirectoryInfo dirB = new DirectoryInfo(DirectoryPathB);
-
-            FileInfo[] filesB = dirB.GetFiles("*.*", SearchOption.AllDirectories).Where(IsValidFile).ToArray();
-            
-            var fileComparer = new FileCompare(DirectoryPathA, DirectoryPathB);
-            
-            await Task.Run(() => {
-                var differences = new List<FileInfo>();
-                for (int i = 0; i < filesB.Length; i++) {
-                    // Check if the file in B's director does not exist in directory A
-                    if (!filesA.Contains(filesB[i], fileComparer))
-                        differences.Add(filesB[i]);
-                }
-
-                Differences = differences.ToArray();
-                Console.WriteLine($"Found {Differences.Length} differences.");
-            });
-
-            return Differences;
-        }
-
-        public void CopyDifferencesTo(string outputDirectory)
-        {
-            // Create the output directory (Or do nothing if it exists)
-            Directory.CreateDirectory(outputDirectory);
-            
-            foreach (var file in Differences) {
-                var fullDirPath = file.DirectoryName;
-                string relativePath = GetRelativePath(fullDirPath, DirectoryPathB);
-
-                var newPath = Path.Combine(outputDirectory, relativePath);
-                Directory.CreateDirectory(newPath);
-
-                File.Copy(file.FullName, Path.Combine(newPath, file.Name), true);
-
-                // Copy the .min and .min.map for js files
-                if (file.Extension == ".js") {
-                    var fileName = Path.GetFileNameWithoutExtension(file.FullName).Replace(".min", "");
-                    var originalFilePath = Path.Combine(file.DirectoryName, $"{fileName}.js");
-                    var mapFilePath = Path.Combine(file.DirectoryName, $"{fileName}.min.js.map");
-
-                    if (!File.Exists(originalFilePath))
-                        throw new FileNotFoundException($"Could not find the .js for '{fileName}' inside {file.DirectoryName}");
-
-                    if (!File.Exists(mapFilePath))
-                        throw new FileNotFoundException($"Could not find the .min.js.map for '{fileName}' inside {file.DirectoryName}");
-
-                    // TODO Check the min/map files are up to date
-                    File.Copy(originalFilePath, Path.Combine(newPath, $"{fileName}.js"));
-                    File.Copy(mapFilePath, Path.Combine(newPath, $"{fileName}.min.js.map"));
-                }
-            }
-        }
+        private string[] ExcludedExtensions { get; set; } = new string[] { ".js", ".map", ".pdb", ".csproj", ".user" };
+        private string[] ExcludedDirectories { get; set; } = new string[] { "obj", "Documents", "Downloads" };
+        private string[] ExcludedFiles { get; set; } = new string[] { "debuglog", "log.txt", "listinglayout", "reportdata", "userdata", "Web.config",
+                                                                     "log4net", "Newtonsoft.json", "System.Net", "System.Web", "MEXData_Ideablade.dll",
+                                                                     "UpgradeSQL.sql", "Mexdata.dll.config", "IdeaBlade.ibconfig", "jquery.livequery.min.js" };
         
-        private static async Task DeleteFileAsync(FileInfo file)
+        public DirectoryCompare(string pathA, string pathB)
         {
-            await Task.Run(() => {
-                file.Delete();
+            this.PathA = pathA;
+            this.PathB = pathB;
+        }
+
+        public async Task<string[]> GetDifferencesAsync(bool ignoreRootFiles)
+        {
+            // If both paths are empty return null
+            if (this.PathA.IsEmpty() && this.PathB.IsEmpty())
+                return null;
+
+            return await Task.Run(() => {
+                // Get all files in PathA and Path B
+                var filesA = this.GetFilesInDirectory(this.PathA, ignoreRootFiles);
+                var filesB = this.GetFilesInDirectory(this.PathB, ignoreRootFiles);
+
+                // If PathA wasn't passed in, return all of PathB's files
+                if (this.PathA.IsEmpty())
+                    return filesB;
+
+                var fileComparer = new FileCompare();
+
+                var differences = new List<string>(filesB.Length);
+                for (int i = 0; i < filesB.Length; i++) {
+                    var file = filesB[i];
+
+                    // If fileB is in FilesA continue on
+                    if (filesA.Contains(file, fileComparer))
+                        continue;
+
+                    differences.Add(file);
+                    
+                    // Special case for .js files. We only considered .min files 'valid', so we need to add the .js and .map files back
+                    if (Path.GetExtension(file) == ".js") {
+                        var fileDirectory = Path.GetDirectoryName(file);
+                        var baseFileName = Path.GetFileNameWithoutExtension(file).Replace(".min", "");
+
+                        // Get the .js and .map files for this .min file
+                        var baseJSFile = Path.Combine(fileDirectory, $"{baseFileName}.js");
+                        var mapFile = Path.Combine(fileDirectory, $"{baseFileName}.min.js.map");
+
+                        // Check the .js and .map exist
+                        if (!File.Exists(baseJSFile))
+                            throw new FileNotFoundException($"Could not find the .js file for '{baseFileName}' inside {fileDirectory}");
+                        if (!File.Exists(mapFile))
+                            throw new FileNotFoundException($"Could not find the .js file for '{mapFile}' inside {fileDirectory}");
+
+                        // TODO: Probably check that the min/map were modified AFTER the base JS file
+                        // Add the files as differences
+                        differences.Add(baseJSFile);
+                        differences.Add(mapFile);
+                    }
+                }
+
+                return differences.ToArray();
             });
         }
 
-        public static async Task ClearDirectory(string dirPath)
+        private string[] GetFilesInDirectory(string path, bool ignoreRootFiles)
         {
-            // Delete all files/Folders in there
-            var outputDir = new DirectoryInfo(dirPath);
+            // If the path is null or empty, return null
+            if (path.IsEmpty())
+                return null;
 
-            var allFiles = outputDir.GetFiles("*.*", SearchOption.AllDirectories);
-            var tasks = new Task[allFiles.Length];
-
-            // Queue up file deletions
-            for (int i = 0; i < allFiles.Length; i++) {
-                tasks[i] = DeleteFileAsync(allFiles[i]);
-            }
-
-            await Task.WhenAll(tasks);
-
-            outputDir.Delete(true);
-            Directory.CreateDirectory(dirPath);
+            var directory = new DirectoryInfo(path);
+            // Gets all files that are valid and selects the full name
+            return directory.GetFiles("*.*", SearchOption.AllDirectories)
+                            .Where(file => IsValidFile(file.FullName, ignoreRootFiles))
+                            .Select(file => file.FullName).ToArray();
         }
 
-        private bool IsValidFile(FileInfo file)
+        private bool IsValidFile(string file, bool ignoreRootFiles)
         {
-            if (IgnoreRootFiles) {
-                if (file.DirectoryName == DirectoryPathA || file.DirectoryName == DirectoryPathB)
+            var fileDirectory = Path.GetDirectoryName(file);
+            var fileName = Path.GetFileName(file);
+            
+            if (ignoreRootFiles) {
+                // If we are ignoring root files and this files directory matches PathA or PathB, return false
+                if (fileDirectory == this.PathA || fileDirectory == this.PathB)
                     return false;
             }
 
-            if (ExcludeExtensions.Any(x => file.Name.EndsWith(x, StringComparison.OrdinalIgnoreCase)))
+            // Check this files extension isn't included in any of the excluded extensions
+            if (this.ExcludedExtensions.Any(x => fileName.EndsWith(x, StringComparison.OrdinalIgnoreCase)))
                 return false;
 
-            if (ExcludeFiles.Any(x => file.Name.StartsWith(x, StringComparison.OrdinalIgnoreCase)))
+            // Check this file isn't included in any of the excluded files
+            if (this.ExcludedFiles.Any(x => fileName.StartsWith(x, StringComparison.OrdinalIgnoreCase)))
                 return false;
 
-            if (ExcludePaths.Any(x => GetRelativePath(file.DirectoryName, DirectoryPathA).StartsWith(x) || GetRelativePath(file.DirectoryName, DirectoryPathB).StartsWith(x)))
+            // Check this file isn't in any of the excluded directories
+            if (this.ExcludedDirectories.Any(x => GetRelativePath(fileDirectory, this.PathA).StartsWith(x) || GetRelativePath(fileDirectory, this.PathB).StartsWith(x)))
                 return false;
-
-            // All .min.js files are included unless specified
-            if (file.Name.EndsWith(".min.js"))
-                return true;
-
+            
             return true;
         }
+
+        #region Helper Functions
 
         public static string GetRelativePath(string path, string rootPath)
         {
@@ -177,5 +130,7 @@ namespace CustomWorkBundler
 
             return relativePath;
         }
+
+        #endregion
     }
 }

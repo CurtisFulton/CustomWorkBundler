@@ -1,0 +1,4 @@
+/******************************** Changed Files ********************************/
+
+Test\DifferentFile.txt
+Test\NewFile.txt

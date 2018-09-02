@@ -1,0 +1,28 @@
+﻿<Window x:Class="CustomWorkBundler.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:View="clr-namespace:CustomWorkBundler.WPF.Views"
+        mc:Ignorable="d"
+        Title="Custom Work Bundler" Height="810" Width="600" MinHeight="793" MinWidth="600"
+        Closing="OnWindowClosing">
+    <Grid Margin="10" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Main Content -->
+        <View:BundleDetailsView Grid.Row="0" DataContext="{Binding BundleDetails}"/>
+
+        <!-- Progress Output -->
+        <TextBox Grid.Row="1" Background="Transparent" BorderThickness="0" IsReadOnly="True" TextWrapping="Wrap" 
+                 IsTabStop="False" Text="{Binding Progress}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBox>
+
+        <!-- Bundle Button -->
+        <Button Grid.Row="2" HorizontalAlignment="Center" Padding="20 5" Command="{Binding StartBundleCommand}"
+                IsEnabled="{Binding BundleDetails.ValidBundle}" Margin="0 10 0 0">Bundle</Button>
+    </Grid>
+</Window>

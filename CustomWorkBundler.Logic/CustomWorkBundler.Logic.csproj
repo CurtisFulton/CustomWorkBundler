@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{25A4F8BB-C19B-4933-B701-70370D9178A6}</ProjectGuid>
+    <ProjectGuid>{EC0AF98E-07BA-4B79-A97A-4A0467C062BE}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>CustomWorkBundler</RootNamespace>
-    <AssemblyName>CustomWorkBundler</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CustomWorkBundler.Logic</RootNamespace>
+    <AssemblyName>CustomWorkBundler.Logic</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,61 +29,50 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="RedGate.BackupReader, Version=3.0.0.0, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Red Gate\SQL Comparison SDK 10\Assemblies\SQL Compare\RedGate.BackupReader.dll</HintPath>
+    <Reference Include="Microsoft.Data.DataConnectionConfiguration">
+      <HintPath>..\References\Microsoft.Data.DataConnectionConfiguration.dll</HintPath>
     </Reference>
-    <Reference Include="RedGate.BackupReader.SqbReader, Version=3.0.0.0, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Red Gate\SQL Comparison SDK 10\Assemblies\SQL Compare\RedGate.BackupReader.SqbReader.dll</HintPath>
+      <HintPath>..\References\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RedGate.Migrations.Core, Version=1.0.0.853, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
+    <Reference Include="Redgate.Client.Common, Version=3.0.0.0, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Red Gate\SQL Comparison SDK 10\Assemblies\SQL Compare\RedGate.Migrations.Core.dll</HintPath>
+      <HintPath>..\References\Redgate.Client.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="RedGate.Client.Shims.Common, Version=3.0.0.0, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\RedGate.Client.Shims.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="RedGate.Licensing.Client, Version=3.0.1.170, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\RedGate.Licensing.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="RedGate.Licensing.Client.UI, Version=3.0.1.170, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\RedGate.Licensing.Client.UI.dll</HintPath>
     </Reference>
     <Reference Include="RedGate.Shared.ComparisonInterfaces, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Red Gate\SQL Comparison SDK 10\Assemblies\SQL Compare\RedGate.Shared.ComparisonInterfaces.dll</HintPath>
+      <HintPath>..\References\RedGate.Shared.ComparisonInterfaces.dll</HintPath>
     </Reference>
-    <Reference Include="RedGate.Shared.SQL, Version=19.0.0.0, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
+    <Reference Include="RedGate.Shared.SQL, Version=9.5.0.875, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Red Gate\SQL Comparison SDK 10\Assemblies\SQL Compare\RedGate.Shared.SQL.dll</HintPath>
+      <HintPath>..\References\RedGate.Shared.SQL.dll</HintPath>
     </Reference>
     <Reference Include="RedGate.Shared.Utils, Version=9.5.0.825, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Red Gate\SQL Comparison SDK 10\Assemblies\SQL Compare\RedGate.Shared.Utils.dll</HintPath>
-    </Reference>
-    <Reference Include="RedGate.SOCCompareInterface, Version=3.0.50.59, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Red Gate\SQL Comparison SDK 10\Assemblies\SQL Compare\RedGate.SOCCompareInterface.dll</HintPath>
-    </Reference>
-    <Reference Include="RedGate.SQLCompare.ASTParser, Version=12.4.11.2735, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Red Gate\SQL Comparison SDK 10\Assemblies\SQL Compare\RedGate.SQLCompare.ASTParser.dll</HintPath>
+      <HintPath>..\References\RedGate.Shared.Utils.dll</HintPath>
     </Reference>
     <Reference Include="RedGate.SQLCompare.Engine, Version=12.4.11.2735, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Red Gate\SQL Comparison SDK 10\Assemblies\SQL Compare\RedGate.SQLCompare.Engine.dll</HintPath>
-    </Reference>
-    <Reference Include="RedGate.SQLCompare.Rewriter, Version=12.4.11.2735, Culture=neutral, PublicKeyToken=7f465a1c156d4d57, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Red Gate\SQL Comparison SDK 10\Assemblies\SQL Compare\RedGate.SQLCompare.Rewriter.dll</HintPath>
+      <HintPath>..\References\RedGate.SQLCompare.Engine.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SQLite, Version=1.0.85.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Red Gate\SQL Comparison SDK 12\Assemblies\SQL Compare\System.Data.SQLite.dll</HintPath>
-    </Reference>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.Threading">
-      <HintPath>C:\Users\curtis\Desktop\Refs\System.Threading.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -95,29 +81,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BundleProgress.cs" />
+    <Compile Include="DatabaseCompare.cs" />
     <Compile Include="DirectoryCompare.cs" />
+    <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="FileCompare.cs" />
+    <Compile Include="General.js.cs" />
+    <Compile Include="PackageBuilder.cs" />
+    <Compile Include="Events\Event.cs" />
+    <Compile Include="Events\ProgressChangedEvent.cs" />
     <Compile Include="ManualUpdateBundler.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SQLCompare.cs" />
-    <Compile Include="VBUpdateScript.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="licenses.licx" />
-    <EmbeddedResource Include="VBTemplate.vb" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>11.0.2</Version>
-    </PackageReference>
-    <PackageReference Include="Resourcer.Fody">
-      <Version>1.7.1</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
